@@ -1,10 +1,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Modern.ChainMerge where
+module Research.ChainMerge where
 
 import Data.Array.MArray
 import Control.Monad.ST.Lazy
 import Data.Array.ST
+
+type Freq = Double
+
+freqSeries :: Freq -> [Freq]
+freqSeries freq = [freq * fromIntegral i | i <- [0..]]
 
 chainMerge :: [[Double]] -> [Double]
 chainMerge xss = runST $ do
@@ -19,7 +24,7 @@ chainMerge xss = runST $ do
               writeArray arr n vs
               vs' <- chainLoop' (n+1)
               return (v:vs')
-            False -> return []
+            False -> chainLoop' (n+1)
 
   let loop = do
         (v0:vs@(v1:_)) <- readArray arr 0
@@ -30,3 +35,18 @@ chainMerge xss = runST $ do
 
   pss <- loop
   return $ concat pss
+  
+mergeBy :: (a -> a -> Ordering) -> [a] -> [a] -> [a]
+mergeBy cmp xs ys = merge xs ys where
+  merge [] [] = []
+  merge a@(x:xs) [] = a
+  merge [] a@(x:xs) = a
+  merge a@(x:xs) b@(y:ys) = case cmp x y of
+    LT -> x : merge xs b
+    EQ -> x : merge xs b
+    GT -> y : merge a ys
+
+mergeByS :: (a -> a -> Ordering) -> [[a]] -> [a]
+mergeByS cmp xs = mergeS xs where
+  mergeS [] = []
+  mergeS (xs:xss) = mergeBy cmp xs $ mergeS xss

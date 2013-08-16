@@ -1,4 +1,4 @@
-module Modern.LK where
+module Research.LK where
 
 import Data.List
 import Data.Function
@@ -7,16 +7,8 @@ type Point = (Double, Double)
 type Freq = Double
 type Time = Double
 
-freqSeries :: Int -> Freq -> Time -> [Freq]
-freqSeries n freq time = [freq0, freq0+df..] where
-  freq0 = fromIntegral (floor (freq*time)) / time
-  df = 1 / fromIntegral n / time
-
-chain :: Ord a => [a] -> [a]
-chain [] = []
-chain [x] = [x]
-chain (x:y:ps) | x <= y = x:chain (y:ps)
-               | otherwise = [x]
+freqSeries :: Freq -> [Freq]
+freqSeries freq = [freq * fromIntegral i | i <- [0..]]
 
 merge :: Ord a => [a] -> [a] -> [a]
 merge [] [] = []
@@ -29,8 +21,8 @@ mergeS :: Ord a => [[a]] -> [a]
 mergeS [] = []
 mergeS (xs:xss) = merge xs $ mergeS xss
 
-freqSeriesWithIndex :: Int -> Freq -> Time -> [(Int, Freq)]
-freqSeriesWithIndex n f t = zip (cycle [0..n-1]) $ freqSeries n f t
+-- freqSeriesWithIndex :: Int -> Freq -> Time -> [(Int, Freq)]
+-- freqSeriesWithIndex n f t = zip (cycle [0..n-1]) $ freqSeries n f t
 
 insertV0 :: Double -> (Int, Double) -> (Int, Double)
 insertV0 v (i,mean) = (i',mean') where
