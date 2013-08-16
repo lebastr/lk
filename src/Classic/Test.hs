@@ -16,7 +16,7 @@ main = do
   ps <- toFreq <$> loadData "/home/lebedev/Development/lk/data/curve.dat"
 
 --  print $ countLK 0.05 (0.5, 3) ps
-  let xs = lk 0.05 (1, 9) ps
+  let xs = lkV 8 (1, 9) ps
       ys = take 10 $ sortBy (\(_,v0) (_,v1) -> compare v1 v0) xs
 
   print $ countLK 0.05 (1, 9) ps
