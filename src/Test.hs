@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Load
-import Classic.LK
+import LK
 import Text.Printf
 import Control.Monad
 import Control.Applicative

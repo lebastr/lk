@@ -1,4 +1,4 @@
-module Classic.LK where
+module LK where
 
 import Data.List
 import Data.Function
