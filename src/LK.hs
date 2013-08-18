@@ -71,3 +71,9 @@ var nZones freq0 ps = mean $ fromList variances
     getVar ps | length ps <= 20 = []
               | otherwise = [variance $ fromList ps]
     arr = factorByZones nZones freq0 ps
+
+clip :: (a -> Double) -> [a] -> [a]
+clip fun ps = filter ((\x -> abs (x-m) <= d) . fun) ps where
+  vec = fromList $ map fun ps
+  m = mean vec
+  d = 2*sqrt(variance vec)
