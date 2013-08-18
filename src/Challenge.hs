@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Challenge ( runChallenge) where
+module Challenge ( runChallenge, def, Config(..)) where
 
 import Text.Blaze.XHtml5 hiding (map)
 import Text.Blaze.XHtml5.Attributes (src)
@@ -11,17 +11,26 @@ import System.Random
 import Data.Time.Clock
 import Chart
 
+data Config = Config { baseDir :: String
+                     , baseUrl :: String }
+
+def :: Config
+def = Config { baseDir = "/home/lebedev/nginx/static/challenge"
+             , baseUrl = "http://static.smartblobs.org/challenge" }
+
+
+type Plotter = (Double, Double) -> [(Double, Double)] -> IO Attribute
+
+
 class DualPlace a where
-  url :: a -> String
-  url a = baseUrl ++ "/" ++ piece a
-  
-  path :: a -> FilePath
-  path a = baseDir ++ "/" ++ piece a
-  
+  url :: Config -> a -> String
+  url cfg a = baseUrl cfg ++ "/" ++ piece a
+
+  path :: Config -> a -> FilePath
+  path cfg a = baseDir cfg ++ "/" ++ piece a
+
   piece :: a -> String
 
-baseDir = "/home/lebedev/nginx/static/challenge"
-baseUrl = "http://static.smartblobs.org/challenge"
 
 instance DualPlace Challenge where
   piece (Challenge cid) = cid ++ ".html"
@@ -31,12 +40,12 @@ instance DualPlace Image where
 
 newChallenge :: IO Challenge
 newChallenge = do
-  t <- getCurrentTime 
+  t <- getCurrentTime
   let t' = map (\s -> case s of
                    ' ' -> '_'
                    v -> v) $ show t
   return $ Challenge t'
-  
+
 data Challenge = Challenge { challengeCID :: CID } deriving (Show)
 
 type CID = String
@@ -48,18 +57,20 @@ newImage challenge = do
 
 data Image = Image Challenge CID
 
-runChallenge :: (Plotter -> IO Html) -> IO ()
-runChallenge action = do
+runChallenge :: Config -> String -> (Plotter -> IO Html) -> IO ()
+runChallenge cfg challengeTitle action = do
   challenge <- newChallenge
-  createDirectory $ baseDir ++ "/" ++ challengeCID challenge
-  let plotter ps = do
+  createDirectory $ baseDir cfg ++ "/" ++ challengeCID challenge
+  let plotter (x,y) ps = do
         img <- newImage challenge
-        gplotFile (path img) ps
-        return $ src (toValue $ url img)
+        gplotFile (path cfg img) (x,y) ps
+        return $ src (toValue $ url cfg img)
   html <- action plotter
-  writeFile (path challenge) $ renderHtml html
-  print $ url challenge
+  let html' = docTypeHtml $ do
+        title $ toHtml challengeTitle
+        body html
 
+  writeFile (path cfg challenge) $ renderHtml html'
+  print $ url cfg challenge
 
-type Plotter = [(Double, Double)] -> IO Attribute
 

@@ -36,8 +36,8 @@ The final diagram is the chart with the legend next to it.
 > gplot :: Points -> DC
 > gplot ps = centerXY $ chart [ps] plotStyles
 
-> gplotFile :: FilePath -> Points -> IO ()
-> gplotFile fname ps = renderCairo fname (mkSizeSpec (Just 800) (Just 400)) $ gplot ps
+> gplotFile :: FilePath -> (Double, Double) -> Points -> IO ()
+> gplotFile fname (x,y) ps = renderCairo fname (mkSizeSpec (Just x) (Just y)) $ gplot ps
 
 The size of the chart, in logical units.
 
@@ -127,10 +127,10 @@ colour style is just a colour.  These three combined give a "style".
 > type Shape = DC
 > type DotStyle = (Shape, Fill)
 > type LineStyle = DC -> DC
-> 
+>
 > plotStyles :: [ (Shape, LineStyle) ]
 > plotStyles = zipWith3 combineStyles dotStyles colourStyles lineStyles
-> 
+>
 > combineStyles :: DotStyle -> Colour Double -> LineStyle -> (Shape, LineStyle)
 > combineStyles (d,Fill f) c l =
 >   ( d # (if f then fcA (c `withOpacity` 0.5) else id) # lc c, lc c . l )
@@ -155,7 +155,7 @@ Some custom shapes.
 > cross :: Double -> Path R2
 > cross x = fromVertices [ x&(-x) , ((-x)&x) ]
 >           <> fromVertices [ x&x , ((-x)&(-x)) ]
-> 
+>
 > plus :: Double -> Path R2
 > plus x = cross x # rotate (45::Deg)
 
