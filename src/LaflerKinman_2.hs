@@ -12,11 +12,13 @@ import Data.Array.MArray
 import Control.Monad
 import Data.Array.ST
 import Data.Array
+import Control.Parallel.Strategies
 
-lkFreqs :: Int -> Phase -> (Freq, Freq) -> [(Epoch, Mag)] -> [(Freq, Double)]
-lkFreqs zones phase_err (minFreq, maxFreq) curve = take 20 $
-                                                   sortBy (\(_,a0) (_,a1) -> compare a1 a0)
-                                                   [(f, varianceIndex f) | f <- freqs]
+
+lkFreqs :: Phase -> (Freq, Freq) -> [(Epoch, Mag)] -> [(Freq, Double)]
+lkFreqs phase_err (minFreq, maxFreq) curve = take 20 $
+                                             sortBy (\(_,a0) (_,a1) -> compare a1 a0) $
+                                             withStrategy (parListChunk 1024 rdeepseq) [(f, varianceIndex f) | f <- freqs]
   where
     freqs = freqSeries phase_err latestEpoch (minFreq, maxFreq)
     latestEpoch = Epoch $ maximum $ map (fromEpoch.fst) curve
@@ -25,9 +27,9 @@ lkFreqs zones phase_err (minFreq, maxFreq) curve = take 20 $
         mags = map (\(Just s) -> s) $ filter (\s -> case s of
                                                  Nothing -> False
                                                  _ -> True) $ elems $ runSTArray $ do
-          arr <- newArray (0,zones-1) Nothing
+          arr <- newArray (0,total) Nothing
           forM_ curve $ \(t,m) -> do
-            let j = floor $ fromIntegral zones*fromPhase (toPhase freq t)
+            let j = 1 + (floor $ fromIntegral total*fromPhase (toPhase freq t))
             let f = if j `mod` 2 == 0 then max else min
             m0 <- readArray arr j
             case m0 of

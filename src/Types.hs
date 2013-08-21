@@ -1,6 +1,10 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Types where
 
-newtype Freq = Freq { fromFreq :: Double } deriving (Show)
+import Control.Parallel.Strategies
+
+newtype Freq = Freq { fromFreq :: Double } deriving (Show, NFData)
 
 newtype Phase = Phase { fromPhase :: Double } deriving (Show)
 

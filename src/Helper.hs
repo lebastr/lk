@@ -1,25 +1,41 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Helper where
 
 import Types
 import Data.List
 
+floor' :: Double -> Int
+floor' (!x) = (truncate :: Double -> Int) (c_floor x)
+{-# INLINE floor' #-}
+
+foreign import ccall unsafe "math.h floor"
+    c_floor :: Double -> Double
+               
+
+
 sum' :: [Double] -> Double
 sum' = foldl' (+) 0
+{-# INLINE sum' #-}
 
 -- frac x == {x}
 
 frac :: Double -> Double
-frac x = x - (fromIntegral $ floor x)
+frac (!x) = x - (fromIntegral $ floor' x)
+{-# INLINE frac #-}
 
 -- Переводит период в частоту
 
 toFreq :: Epoch -> Freq
-toFreq (Epoch t) = Freq $ 1/t
+toFreq (Epoch !t) = Freq $ 1/t
 
 -- toPhase freq epoch сворачиват по частоте freq наблюдение с эпохой epoch
 
 toPhase :: Freq -> Epoch -> Phase
-toPhase (Freq freq) (Epoch epoch) = Phase $ frac $ freq*epoch
+toPhase (Freq !freq) (Epoch !epoch) = Phase $ frac $ freq*epoch
+{-# INLINE toPhase #-}
+
+
 
 {- freqSeries phase_err epoch (minFreq, maxFreq) порождает последовательность частот,
    для каждой из которой свертка epoch с ней приводит к фиксированному сдвину по фазе phase_err. -}
@@ -31,4 +47,4 @@ freqSeries phase_err epoch (Freq min_freq, Freq max_freq) = map Freq [min_freq',
     min_freq' = roundF df low_freq min_freq
     max_freq' = roundF df low_freq max_freq
     df = low_freq * fromPhase phase_err
-    roundF dx x0 x1 = dx * fromIntegral (floor ((x1 - x0)/dx)) + x0
+    roundF dx x0 x1 = dx * fromIntegral (floor' ((x1 - x0)/dx)) + x0

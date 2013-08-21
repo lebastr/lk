@@ -8,11 +8,13 @@ import Helper
 import Data.Packed.Vector
 import Types
 import Data.Function
+import Control.Parallel.Strategies
+
 
 lkFreqs :: Phase -> (Freq, Freq) -> [(Epoch, Mag)] -> [(Freq, Double)]
 lkFreqs phase_err (minFreq, maxFreq) curve = take 20 $
-                                             sortBy (\(_,a0) (_,a1) -> compare a1 a0)
-                                             [(f, varianceIndex f) | f <- freqs]
+                                             sortBy (\(_,a0) (_,a1) -> compare a1 a0) $
+                                             withStrategy (parListChunk 1024 rdeepseq) [(f, varianceIndex f) | f <- freqs]
   where
     freqs = freqSeries phase_err latestEpoch (minFreq, maxFreq)
     latestEpoch = Epoch $ maximum $ map (fromEpoch.fst) curve
