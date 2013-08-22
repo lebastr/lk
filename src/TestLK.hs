@@ -4,7 +4,7 @@ import Text.Printf
 import Load
 import qualified LaflerKinman as LK0
 import qualified LaflerKinman_2 as LK2
-import qualified LaflerKinman_5 as LK5
+import qualified LaflerKinman_3 as LK3
 import Helper
 import Control.Monad
 import Types
@@ -33,10 +33,10 @@ main = do
     let len = length curve
 --    let stats = LK0.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
     let stats2 = take 10 $ LK2.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
-    let stats5 = take 10 $ LK5.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
+    let stats3 = take 10 $ LK3.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
 --    xs <- plotStats plotter curve stats
     xs2 <- plotStats plotter curve stats2
-    xs5 <- plotStats plotter curve stats5
+    xs3 <- plotStats plotter curve stats3
     return $ do
       h1 $ toHtml fname
       h2 "Parameters:"
@@ -53,4 +53,4 @@ main = do
           renderCol xs2
         td $ do
           p "Second Algorithm"
-          renderCol xs5
+          renderCol xs3

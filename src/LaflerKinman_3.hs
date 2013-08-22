@@ -1,6 +1,6 @@
 {- Классический алгоритм Lafler-Kinman -}
 
-module LaflerKinman_5 where
+module LaflerKinman_3 where
 
 import Data.List
 import Numeric.GSL.Statistics
