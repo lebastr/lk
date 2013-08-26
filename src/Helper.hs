@@ -44,7 +44,7 @@ freqSeries :: Phase -> Epoch -> (Freq, Freq) -> [Freq]
 freqSeries phase_err epoch (Freq min_freq, Freq max_freq) = map Freq [min_freq', min_freq'+df..max_freq']
   where
     low_freq = fromFreq $ toFreq epoch
-    min_freq' = roundF df low_freq min_freq
+    min_freq' = low_freq -- roundF df low_freq min_freq
     max_freq' = roundF df low_freq max_freq
     df = low_freq * fromPhase phase_err
     roundF dx x0 x1 = dx * fromIntegral (floor' ((x1 - x0)/dx)) + x0

@@ -23,8 +23,8 @@ renderCol xs = forM_ xs $ \(Freq f,v,i) -> do
   img ! i
 
 phase_err = 0.05
-low_freq = 0.1
-high_freq = 4
+low_freq = 0.01
+high_freq = 5
 
 main = do
   fname <- head <$> getArgs     
