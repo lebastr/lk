@@ -28,6 +28,7 @@ frac (!x) = x - (fromIntegral $ floor' x)
 
 toFreq :: Epoch -> Freq
 toFreq (Epoch !t) = Freq $ 1/t
+{-# INLINE toFreq #-}
 
 -- toPhase freq epoch сворачиват по частоте freq наблюдение с эпохой epoch
 

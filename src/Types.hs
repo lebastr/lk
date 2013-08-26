@@ -10,5 +10,5 @@ newtype Phase = Phase { fromPhase :: Double } deriving (Show)
 
 type Mag = Double
 
-newtype Epoch = Epoch { fromEpoch :: Double } deriving (Show)
+newtype Epoch = Epoch { fromEpoch :: Double } deriving (Show, Ord, Eq)
 
