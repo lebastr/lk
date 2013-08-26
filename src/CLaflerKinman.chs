@@ -70,10 +70,21 @@ runLaflerKinman freqs obs = unsafePerformIO $ do
     withForeignPtr fptrFreqs $ \ptrFreqs ->
        withForeignPtr fptrVidx $ \ptrVidx ->
            withForeignPtr fptrBins $ \ptrBins ->
-               _runLaflerKinman ptrFreqs (fromIntegral freqsL) ptrObs (fromIntegral obsL) ptrBins 
+               _runLaflerKinman ptrFreqs (fromIntegral freqsL) ptrObs (fromIntegral obsL) ptrBins
                 (fromIntegral binL) ptrVidx
 
   G.basicUnsafeFreeze vidx
 
+varianceIndex :: Double -> S.Vector Observation -> Double
+varianceIndex freq obs = unsafePerformIO $ do
+  bins <- SM.replicate (S.length obs + 1) $ Bin False 0
+  S.unsafeWith obs $ \ptrObs ->
+    SM.unsafeWith bins $ \ptrBins ->
+      return $ realToFrac $ _varianceIndex (realToFrac freq) ptrObs (fromIntegral $ S.length obs)
+                            ptrBins (fromIntegral $ SM.length bins)
+
 foreign import ccall safe "RunLaflerKinman"
   _runLaflerKinman :: Ptr Double -> CInt -> Ptr Observation -> CInt -> Ptr Bin -> CInt -> Ptr VarianceIndex -> IO ()
+
+foreign import ccall safe "VarianceIndex"
+  _varianceIndex :: CDouble -> Ptr Observation -> CInt -> Ptr Bin -> CInt -> CDouble
