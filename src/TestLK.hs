@@ -34,7 +34,7 @@ main = do
 --    let stats = LK0.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
     let stats2 = take 10 $ LK2.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
     let stats3 = take 10 $ LK3.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
-    let stats4 = take 5 $ LK4.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
+    let stats4 = LK4.lkFreqs (Phase phase_err) (Freq low_freq, Freq high_freq) curve
 --    xs <- plotStats plotter curve stats
     -- xs2 <- plotStats plotter curve stats2
     -- xs3 <- plotStats plotter curve stats3

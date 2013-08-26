@@ -18,7 +18,7 @@ splitByN n ps = loop ps where
 
 
 lkFreqs :: Phase -> (Freq, Freq) -> [(Epoch, Mag)] -> [(Freq, Double)]
-lkFreqs phase_err (minFreq, maxFreq) curve = take 20 $
+lkFreqs phase_err (minFreq, maxFreq) curve = take 40 $
                                              sortBy (\(_,a0) (_,a1) -> compare a1 a0) $
                                              map (\p -> (Freq (vFreq p), vIdx p)) $ 
                                              S.toList $ S.concat $ 
